@@ -16,7 +16,7 @@ A comprehensive license plate detection and training system with **Apache 2.0 li
 
 ```bash
 # Clone and setup
-git clone <your-repo-url>
+git clone https://github.com/micrometre/Detectron2
 cd plate_detector
 
 # Create virtual environment
