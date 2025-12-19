@@ -1,0 +1,110 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Model outputs and training artifacts
+output/
+*.pth
+*.pkl
+*.ckpt
+checkpoints/
+logs/
+runs/
+tensorboard/
+
+# Datasets (large files)
+datasets/
+*.zip
+*.tar.gz
+*.tar
+*.rar
+
+# Images and videos (can be large)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Except sample/test images in specific directories
+!images/sample*.jpg
+!images/test*.jpg
+!docs/**/*.jpg
+!docs/**/*.png
+
+# Annotations
+annotations/
+*.json
+!configs/*.json
+
+# Temporary files
+*.tmp
+*.log
+*.cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Detectron2 specific
+detectron2_repo/
+/tmp/
+
+# PaddlePaddle specific
+inference_model/
+*.pdparams
+*.pdopt
+*.pdmodel
+
+# CCPD dataset specific (very large)
+CCPD*/
+ccpd*/
+
+# Converted datasets (keep source, ignore processed)
+datasets/plates/*/images/
+datasets/plates/*/annotations.json
+
+# Keep directory structure
+!datasets/.gitkeep
+!output/.gitkeep
