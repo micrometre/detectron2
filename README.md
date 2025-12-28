@@ -34,31 +34,8 @@ python -m pip install --no-build-isolation 'git+https://github.com/facebookresea
 
 ### Detection (Inference)
 
-#### Option 1: EasyOCR Only (Fastest)
-```bash
-# Single image
-python scripts/detect_easyocr.py image.jpg
 
-# Folder of images
-python scripts/detect_easyocr.py --folder images/ -o results/
-
-# Multi-language (English + Arabic)
-python scripts/detect_easyocr.py image.jpg -l en ar
-```
-
-#### Option 2: Video Processing
-```bash
-# Process video (every 5th frame)
-python scripts/detect_video.py video.mp4
-
-# Process every frame
-python scripts/detect_video.py video.mp4 --skip 1
-
-# Custom output
-python scripts/detect_video.py video.mp4 -o output.mp4
-```
-
-#### Option 3: Two-Stage Pipeline (Most Accurate)
+####  Two-Stage Pipeline (Most Accurate)
 ```bash
 # Vehicle detection → Text recognition
 python scripts/detect_pipeline.py image.jpg

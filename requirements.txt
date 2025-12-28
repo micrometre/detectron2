@@ -1,6 +1,5 @@
 # Detectron2 License Plate Detector
 # Install with: pip install -r requirements.txt
-
 # Core dependencies (CPU version)
 --index-url https://download.pytorch.org/whl/cpu
 torch
@@ -16,3 +15,6 @@ iopath
 
 # Detectron2 - install separately with:
 # pip install --no-build-isolation -e git+https://github.com/facebookresearch/detectron2.git#egg=detectron2
+
+#easyocr for OCR functionality
+easyocr
