@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-License Plate Detection Pipeline for Video
-Stage 1: Detectron2 detects vehicles
-Stage 2: EasyOCR reads text from vehicle regions
+Vehicle Detection Pipeline for Video
+Detects vehicles using Detectron2
 Processes video files frame by frame
 """
 
 import cv2
 import argparse
 from pathlib import Path
-import easyocr
 import numpy as np
 from tqdm import tqdm
 
@@ -67,77 +65,17 @@ def detect_vehicles(image, predictor, cfg):
     return vehicles
 
 
-def read_text_from_region(image, box, reader, expand_ratio=0.1):
+def process_frame(frame, predictor, cfg, vehicles_only=False):
     """
-    Read text from a specific region of the image.
-    Expands the box slightly to catch plates near vehicle edges.
-    """
-    x1, y1, x2, y2 = [int(coord) for coord in box]
-    h, w = image.shape[:2]
-    
-    # Expand box to catch plates that might be at edges
-    expand_x = int((x2 - x1) * expand_ratio)
-    expand_y = int((y2 - y1) * expand_ratio)
-    
-    x1 = max(0, x1 - expand_x)
-    y1 = max(0, y1 - expand_y)
-    x2 = min(w, x2 + expand_x)
-    y2 = min(h, y2 + expand_y)
-    
-    # Crop region
-    region = image[y1:y2, x1:x2]
-    
-    if region.size == 0:
-        return []
-    
-    # Run OCR on the region
-    results = reader.readtext(region)
-    
-    # Adjust coordinates back to full image
-    adjusted_results = []
-    for bbox, text, confidence in results:
-        # Adjust bbox coordinates
-        adjusted_bbox = [[pt[0] + x1, pt[1] + y1] for pt in bbox]
-        adjusted_results.append((adjusted_bbox, text, confidence))
-    
-    return adjusted_results
-
-
-def process_frame(frame, predictor, cfg, reader, text_conf=0.5, expand_ratio=0.1, vehicles_only=False):
-    """
-    Process a single frame: detect vehicles and read text.
+    Process a single frame: detect vehicles.
     Returns annotated frame and detection results.
     """
-    # Stage 1: Detect vehicles
+    # Detect vehicles
     vehicles = detect_vehicles(frame, predictor, cfg)
     
     # If vehicles_only mode and no vehicles detected, return None
     if vehicles_only and len(vehicles) == 0:
         return None, []
-    
-    # Stage 2: Read text from vehicle regions
-    all_text_results = []
-    
-    for vehicle in vehicles:
-        box = vehicle['box']
-        vehicle_class = vehicle['class']
-        vehicle_score = vehicle['score']
-        
-        # Read text from this vehicle region
-        text_results = read_text_from_region(frame, box, reader, expand_ratio)
-        
-        # Filter by confidence
-        text_results = [(bbox, text, conf) for bbox, text, conf in text_results 
-                       if conf >= text_conf]
-        
-        for bbox, text, conf in text_results:
-            all_text_results.append({
-                'vehicle_box': box,
-                'vehicle_class': vehicle_class,
-                'text': text,
-                'confidence': conf,
-                'bbox': bbox
-            })
     
     # Draw results
     output_frame = frame.copy()
@@ -152,28 +90,11 @@ def process_frame(frame, predictor, cfg, reader, text_conf=0.5, expand_ratio=0.1
         cv2.putText(output_frame, label, (x1, y1 - 10), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
     
-    # Draw text boxes (green)
-    for result in all_text_results:
-        bbox = result['bbox']
-        text = result['text']
-        conf = result['confidence']
-        
-        # Convert bbox to rectangle
-        pts = np.array([[int(p[0]), int(p[1])] for p in bbox], np.int32)
-        cv2.polylines(output_frame, [pts], True, (0, 255, 0), 2)
-        
-        # Draw text label
-        x1, y1 = pts[0]
-        label = f"{text} ({conf:.0%})"
-        cv2.putText(output_frame, label, (x1, y1 - 5),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-    
-    return output_frame, all_text_results
+    return output_frame, vehicles
 
 
 def process_video(video_path, output_dir="images", frame_skip=1, threshold=0.6, 
-                 device="cpu", save_video=False, model=None, size=640, nms=0.45,
-                 vehicles_only=False, languages=['en'], text_conf=0.5):
+                 device="cpu", save_video=False, vehicles_only=False):
     """
     Process video file frame by frame.
     """
@@ -201,11 +122,10 @@ def process_video(video_path, output_dir="images", frame_skip=1, threshold=0.6,
     print(f"Device: {device}")
     print(f"Vehicles only mode: {vehicles_only}")
     
-    # Setup detector and OCR
-    print("\nInitializing models...")
+    # Setup detector
+    print("\nInitializing model...")
     predictor, cfg = setup_vehicle_detector(threshold, device)
-    reader = easyocr.Reader(languages, gpu=(device == "cuda"), verbose=False)
-    print("Models loaded successfully")
+    print("Model loaded successfully")
     
     # Setup video writer if needed
     video_writer = None
@@ -234,7 +154,7 @@ def process_video(video_path, output_dir="images", frame_skip=1, threshold=0.6,
         
         # Process frame
         annotated_frame, detections = process_frame(
-            frame, predictor, cfg, reader, text_conf, 0.1, vehicles_only
+            frame, predictor, cfg, vehicles_only
         )
         
         # Save frame if detections found (or if not in vehicles_only mode)
@@ -266,7 +186,7 @@ def process_video(video_path, output_dir="images", frame_skip=1, threshold=0.6,
 def main():
     """Command-line interface"""
     parser = argparse.ArgumentParser(
-        description="Process video files for object detection using Detectron2 + EasyOCR",
+        description="Process video files for vehicle detection using Detectron2",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     
@@ -308,49 +228,14 @@ def main():
     parser.add_argument(
         "--save-video",
         action="store_true",
+        default=True,
         help="Save output as video file (in addition to frames)"
-    )
-    
-    parser.add_argument(
-        "--model",
-        type=str,
-        default="models/yolox_s.pth",
-        help="Path to YOLOX model weights (not used with Detectron2, kept for compatibility)"
-    )
-    
-    parser.add_argument(
-        "--size",
-        type=int,
-        default=640,
-        help="Input size for model (not used with Detectron2, kept for compatibility)"
-    )
-    
-    parser.add_argument(
-        "--nms",
-        type=float,
-        default=0.45,
-        help="NMS threshold (not used with Detectron2, kept for compatibility)"
     )
     
     parser.add_argument(
         "--vehicles-only",
         action="store_true",
         help="Only save frames with vehicles detected"
-    )
-    
-    parser.add_argument(
-        "-l", "--languages",
-        type=str,
-        nargs='+',
-        default=['en'],
-        help="Languages for OCR (e.g., en ar fr)"
-    )
-    
-    parser.add_argument(
-        "--text-conf",
-        type=float,
-        default=0.5,
-        help="Text recognition confidence threshold (0.0-1.0)"
     )
     
     args = parser.parse_args()
@@ -362,12 +247,7 @@ def main():
         args.threshold,
         args.device,
         args.save_video,
-        args.model,
-        args.size,
-        args.nms,
-        args.vehicles_only,
-        args.languages,
-        args.text_conf
+        args.vehicles_only
     )
 
 

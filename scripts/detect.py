@@ -82,6 +82,10 @@ def detect_objects(image_path, output_path=None, confidence=0.5):
     
     # Save or return result
     if output_path:
+        # Create output directory if it doesn't exist
+        output_path_obj = Path(output_path)
+        output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+        
         cv2.imwrite(str(output_path), result_image)
         print(f"\nResult saved to: {output_path}")
     
@@ -91,17 +95,21 @@ def detect_objects(image_path, output_path=None, confidence=0.5):
 def main():
     parser = argparse.ArgumentParser(description="Detectron2 Object Detection")
     parser.add_argument("image", type=str, help="Path to input image")
-    parser.add_argument("-o", "--output", type=str, default=None, help="Path to save output image")
     parser.add_argument("-c", "--confidence", type=float, default=0.5, help="Confidence threshold (0-1)")
+    parser.add_argument(
+        "-o", "--output-dir",
+        type=str,
+        default="results-images",
+        help="Directory to save detected frames"
+    )
     
     args = parser.parse_args()
     
-    # Set default output path
-    if args.output is None:
-        input_path = Path(args.image)
-        args.output = str(input_path.parent / f"{input_path.stem}_detected{input_path.suffix}")
+    # Generate output path using output directory
+    input_path = Path(args.image)
+    output_path = Path(args.output_dir) / f"{input_path.stem}_detected{input_path.suffix}"
     
-    detect_objects(args.image, args.output, args.confidence)
+    detect_objects(args.image, str(output_path), args.confidence)
 
 
 if __name__ == "__main__":
