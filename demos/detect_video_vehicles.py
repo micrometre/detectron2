@@ -199,7 +199,7 @@ def main():
     parser.add_argument(
         "-o", "--output-dir",
         type=str,
-        default="images",
+        default="video_images",
         help="Directory to save detected frames"
     )
     

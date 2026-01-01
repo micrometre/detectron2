@@ -1,4 +1,5 @@
 .PHONY: clean
 clean:
-	rm -rf images/*
+	rm -rf results_images/*
+	rm -rf video_images/*
 	

@@ -4,10 +4,8 @@ A comprehensive license plate detection and training system with **Apache 2.0 li
 
 ## 🚀 Features
 
-- **Multiple Detection Methods**: EasyOCR, Video processing, Two-stage pipeline
 - **Custom Model Training**: Train on CCPD dataset with Detectron2
 - **Dataset Validation**: Pre-training validation and COCO conversion tools
-- **Multi-language Support**: 80+ languages via EasyOCR
 - **Production Ready**: Apache 2.0 licensed, commercially friendly
 
 ## 📦 Quick Start
@@ -36,13 +34,41 @@ python -m pip install --no-build-isolation 'git+https://github.com/facebookresea
 
 
 ####  Two-Stage Pipeline (Most Accurate)
+
+# Object detection on images
+
 ```bash
-# Vehicle detection → Text recognition
-python scripts/detect_pipeline.py image.jpg
+python demos/detect_image_objects.py test-images/public.jpg 
+```
+
+# Vehicle detection on images
+
+```bash
+python demos/detect_image_vehicles.py test-images/public.jpg 
+```
 
 # Adjust thresholds
-python scripts/detect_pipeline.py image.jpg --vehicle-conf 0.7 --text-conf 0.5
+
+```bash
+python demos/detect_image_vehicles.py test-images/public.jpg  --vehicle-conf 0.7 
 ```
+
+
+# Object detection with a videos 
+
+```bash
+python demos/detect_video_obects.py ~/Videos/uk_road.mp4 -s 10
+
+```
+
+# Vehicle detection with videos
+
+```bash
+python demos/detect_video_vehicles.py ~/Videos/uk_road.mp4 -s 10
+
+```
+
+
 
 ### Training Custom Models
 
@@ -128,10 +154,11 @@ python tools/train_plate_detector.py \
 
 ```
 plate_detector/
-├── scripts/              # Detection scripts
-│   ├── detect_easyocr.py
-│   ├── detect_video.py
-│   └── detect_pipeline.py
+├── demos/              # Detection scripts
+│   ├── detect_image_objects.py
+│   └── detect_image_vehicles.py
+│   ├── detect_video_objects.py
+│   ├── detect_video_vehicles.py
 ├── tools/                # Training and conversion tools
 │   ├── validate_ccpd_dataset.py
 │   ├── ccpd_to_coco.py
@@ -177,7 +204,6 @@ Example:
 ## 📄 License
 
 - **Detectron2**: Apache 2.0 (Facebook)
-- **EasyOCR**: Apache 2.0 (JaidedAI)
 - **PyTorch**: BSD-style (Facebook)
 
 All components are **commercially friendly** with permissive licenses.
@@ -185,7 +211,6 @@ All components are **commercially friendly** with permissive licenses.
 ## 🔗 References
 
 - [Detectron2](https://github.com/facebookresearch/detectron2)
-- [EasyOCR](https://github.com/JaidedAI/EasyOCR)
 - [CCPD Dataset](https://github.com/detectRecog/CCPD)
 
 ## 📚 Documentation

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-License Plate Detector using Facebook's Detectron2
+Object Detector using Facebook's Detectron2
 Uses a pre-trained model for general object detection.
 """
 
@@ -99,7 +99,7 @@ def main():
     parser.add_argument(
         "-o", "--output-dir",
         type=str,
-        default="results-images",
+        default="results_images",
         help="Directory to save detected frames"
     )
     
@@ -107,7 +107,7 @@ def main():
     
     # Generate output path using output directory
     input_path = Path(args.image)
-    output_path = Path(args.output_dir) / f"{input_path.stem}_detected{input_path.suffix}"
+    output_path = Path(args.output_dir) / f"{input_path.stem}_detected_objects{input_path.suffix}"
     
     detect_objects(args.image, str(output_path), args.confidence)
 
