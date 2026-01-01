@@ -1,6 +1,6 @@
 # License Plate Detector
 
-A comprehensive license plate detection and training system with **Apache 2.0 licensed** components (Detectron2 + EasyOCR).
+A comprehensive license plate detection training system with Detectron2.
 
 ## 🚀 Features
 
@@ -32,8 +32,6 @@ python -m pip install --no-build-isolation 'git+https://github.com/facebookresea
 
 ### Detection (Inference)
 
-
-####  Two-Stage Pipeline (Most Accurate)
 
 # Object detection on images
 
