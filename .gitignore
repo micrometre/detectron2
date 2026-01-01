@@ -54,15 +54,6 @@ datasets/
 *.tar
 *.rar
 
-# Images and videos (can be large)
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.mp4
-*.avi
-*.mov
-*.mkv
 
 # Except sample/test images in specific directories
 !images/sample*.jpg
